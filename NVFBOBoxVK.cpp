@@ -306,7 +306,7 @@ bool NVFBOBoxVK::initRT()
         // Multisample case: have a color buffer as the resolve-target
         //
         rpinfo = NVK::VkRenderPassCreateInfo(
-        NVK::VkAttachmentDescription
+        std::move(NVK::VkAttachmentDescription
             (   VK_FORMAT_R8G8B8A8_UNORM, (VkSampleCountFlagBits)depthSamples,                             //format, samples
                 VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE,          //loadOp, storeOp
                 VK_ATTACHMENT_LOAD_OP_DONT_CARE, VK_ATTACHMENT_STORE_OP_DONT_CARE,  //stencilLoadOp, stencilStoreOp
@@ -321,7 +321,7 @@ bool NVFBOBoxVK::initRT()
                 VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE,          //loadOp, storeOp
                 VK_ATTACHMENT_LOAD_OP_DONT_CARE, VK_ATTACHMENT_STORE_OP_DONT_CARE,  //stencilLoadOp, stencilStoreOp
                 VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL //initialLayout, finalLayout
-            ),
+            )),
         NVK::VkSubpassDescription
         (   VK_PIPELINE_BIND_POINT_GRAPHICS,//pipelineBindPoint
             NULL,                           //inputAttachments
@@ -338,7 +338,7 @@ bool NVFBOBoxVK::initRT()
         // NON-Multisample case: no need for intermediate resolve target
         //
         rpinfo = NVK::VkRenderPassCreateInfo(
-        NVK::VkAttachmentDescription
+        std::move(NVK::VkAttachmentDescription
             (   VK_FORMAT_R8G8B8A8_UNORM, VK_SAMPLE_COUNT_1_BIT,                                        //format, samples
                 VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE,          //loadOp, storeOp
                 VK_ATTACHMENT_LOAD_OP_DONT_CARE, VK_ATTACHMENT_STORE_OP_DONT_CARE,  //stencilLoadOp, stencilStoreOp
@@ -348,7 +348,7 @@ bool NVFBOBoxVK::initRT()
                 VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE,
                 VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE,
                 VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-            ),
+            )),
         NVK::VkSubpassDescription
         (   VK_PIPELINE_BIND_POINT_GRAPHICS,//pipelineBindPoint
             NULL,                           //inputAttachments
@@ -393,13 +393,14 @@ bool NVFBOBoxVK::initRT()
 		// init the texture that will also be the buffer to render to
 		//
         m_tileData[i].color_texture_SS.img        = m_nvk.createImage2D(bufw, bufh, m_tileData[i].color_texture_SS.imgMem, VK_FORMAT_R8G8B8A8_UNORM);
-        m_tileData[i].color_texture_SS.imgView    = m_nvk.vkCreateImageView(NVK::VkImageViewCreateInfo(
+        NVK::VkImageViewCreateInfo imageViewInfo(
             m_tileData[i].color_texture_SS.img, // image
             VK_IMAGE_VIEW_TYPE_2D, //viewType
             VK_FORMAT_R8G8B8A8_UNORM, //format
             NVK::VkComponentMapping(),//channels
             NVK::VkImageSubresourceRange()//subresourceRange
-            ) );
+            );
+	m_tileData[i].color_texture_SS.imgView    = m_nvk.vkCreateImageView(imageViewInfo);
 		//
 		// Handle multisample FBO's first
 		//

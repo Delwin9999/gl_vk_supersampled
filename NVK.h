@@ -379,15 +379,15 @@ public:
             VkImage                                     image,
             VkImageViewType                             viewType,
             VkFormat                                    format,
-            VkComponentMapping                          &components,
-            VkImageSubresourceRange                     &subresourceRange
+            VkComponentMapping                          &&components,
+            VkImageSubresourceRange                     &&subresourceRange
         ) {
             s.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
             s.pNext = NULL;
             s.image = image;
             s.viewType = viewType;
             s.format = format;
-			s.components = components.s;
+            s.components = components.s;
             s.subresourceRange = subresourceRange.s;
         }
         inline ::VkImageViewCreateInfo* getItem() { return &s; }
@@ -792,7 +792,9 @@ public:
         {
             s.resize(s.size()+1);
             VkRect2D &r = s.back();
-            r = VkRect2D(VkOffset2D(x,y), VkExtent2D(w,h));
+            VkOffset2D offset(x, y);
+            VkExtent2D extent(w, h);
+            r = VkRect2D(offset, extent);
         }
         inline ::VkRect2D* getItem(int n) { return &s[n]; }
         inline int size() { return s.size(); }
@@ -1748,6 +1750,7 @@ public:
             s.pDependencies = dependencies;
             return *this;
         }
+
         VkRenderPassCreateInfo(
             VkAttachmentDescription            &_attachments,
             VkSubpassDescription               &_subpasses,
@@ -1765,6 +1768,38 @@ public:
             s.dependencyCount = dependencies.size();
             s.pDependencies = dependencies;
         }
+        VkRenderPassCreateInfo& operator=(VkRenderPassCreateInfo&& src) {
+            s.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+            s.pNext = NULL;
+            attachments = src.attachments;
+            s.attachmentCount = attachments.size();
+            s.pAttachments = attachments;
+            subpasses = src.subpasses;
+            s.subpassCount = subpasses.size();
+            dependencies = src.dependencies;
+            s.pSubpasses = subpasses;
+            s.dependencyCount = dependencies.size();
+            s.pDependencies = dependencies;
+            return *this;
+        }
+      VkRenderPassCreateInfo(
+            VkAttachmentDescription            &&_attachments,
+            VkSubpassDescription               &&_subpasses,
+            VkSubpassDependency                &&_dependencies)
+        {
+            s.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+            s.pNext = NULL;
+            attachments = _attachments;
+            s.attachmentCount = attachments.size();
+            s.pAttachments = attachments;
+            subpasses = _subpasses;
+            s.subpassCount = subpasses.size();
+            dependencies = _dependencies;
+            s.pSubpasses = subpasses;
+            s.dependencyCount = dependencies.size();
+            s.pDependencies = dependencies;
+        }
+
         ::VkRenderPassCreateInfo* getItem() { return &s; }
         operator ::VkRenderPassCreateInfo* () { return &s; }
     private:

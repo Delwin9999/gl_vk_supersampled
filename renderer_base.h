@@ -209,6 +209,7 @@ inline void buildFur(std::vector<Vertex> &data)
         dvec = pos;
         pos *= 0.1;
         nvec = normalize(cross(dvec, vec3f(0,1,0)));
-        buildStrand(data, pos, dvec, nvec, vec2(thick,length/nsteps), nsteps ,curve, color);
+        vec2 tln(thick, length/nsteps);
+        buildStrand(data, pos, dvec, nvec, tln, nsteps ,curve, color);
     }
 }

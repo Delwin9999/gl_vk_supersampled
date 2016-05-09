@@ -47,7 +47,7 @@ _add_project_definitions(${PROJNAME})
 # add files in PACKAGE_SOURCE_FILES
 #
 _add_package_VulkanSDK()
-_add_package_NSight()
+#_add_package_NSight()
 _add_package_MFCUI()
 #_add_package_AntTweakBar()
 _add_package_OpenGLText()

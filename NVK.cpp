@@ -1263,14 +1263,13 @@ VkBuffer NVK::MemoryChunk::createBufferAlloc(VkBufferCreateInfo &bufferInfo, ::V
 //------------------------------------------------------------------------------
 VkBuffer NVK::MemoryChunk::createBufferAlloc(size_t size, ::VkFlags bufferUsage, ::VkFlags memProps, ::VkDeviceMemory *bufferMem)
 {
-    return createBufferAlloc(VkBufferCreateInfo(
-            size,
+    VkBufferCreateInfo info(size,
             bufferUsage,
             0,
             VK_SHARING_MODE_EXCLUSIVE /*VkSharingMode sharingMode*/,
             0/*uint32_t queueFamilyCount*/,
-            NULL/*const uint32_t* pQueueFamilyIndices*/),
-        memProps, bufferMem);
+            NULL/*const uint32_t* pQueueFamilyIndices*/);
+    return createBufferAlloc(info, memProps, bufferMem);
 }
 //------------------------------------------------------------------------------
 //
@@ -1278,14 +1277,14 @@ VkBuffer NVK::MemoryChunk::createBufferAlloc(size_t size, ::VkFlags bufferUsage,
 VkBuffer NVK::MemoryChunk::createBufferAllocFill(::VkCommandPool cmdPool, size_t size, const void* bufferData, ::VkFlags bufferUsage, ::VkFlags memProps, ::VkDeviceMemory *bufferMem)
 {
     VkResult result = VK_SUCCESS;
-    VkBuffer buffer = createBufferAlloc(VkBufferCreateInfo(
-            size,
-            bufferUsage,
-            0,
-            VK_SHARING_MODE_EXCLUSIVE /*VkSharingMode sharingMode*/,
-            0/*uint32_t queueFamilyCount*/,
-            NULL/*const uint32_t* pQueueFamilyIndices*/),
-        memProps, bufferMem);
+    VkBufferCreateInfo info(size,
+                            bufferUsage,
+                            0,
+                            VK_SHARING_MODE_EXCLUSIVE /*VkSharingMode sharingMode*/,
+                            0/*uint32_t queueFamilyCount*/,
+                            NULL/*const uint32_t* pQueueFamilyIndices*/);
+
+    VkBuffer buffer = createBufferAlloc(info, memProps, bufferMem);
     if (bufferData)
     {
       result = nvk->fillBuffer(cmdPool, size, result, bufferData, buffer);
